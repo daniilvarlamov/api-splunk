@@ -58,7 +58,7 @@ if __name__=="__main__":
     password = "1q@3e4r"
     index="denis_linux"
     name="321"
-    sourcetype="test_sourcetype"
+    sourcetype=index
     http_inputs_url = f"{splunk_host}/services/data/inputs/http"
 
     set_response = set_HEC_splunk(http_inputs_url,index,name,sourcetype,username,password)
