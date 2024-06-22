@@ -1,6 +1,9 @@
 # api splunk
  
 Информация по файлам:
+
+
+
 /create_api/api_HEC_splunk.py - Создание токена HTTP коллектора
 
 
