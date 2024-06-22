@@ -41,42 +41,5 @@ if __name__=="__main__":
         if response.status_code==201:
             print("Успешно создано на узле:" + splunk_host)
         else:
-            print("Ошибка. Подробности: \n"+response)
+            print("Ошибка. Подробности: \n"+response.text)
 
-
-# import requests
-
-# # Параметры
-# splunk_host = "https://192.168.5.61:8089"
-# username = "admin"
-# password = "1q@3e4r"
-# index_name = "devtutorial"
-
-# # Отключение предупреждений о SSL
-# requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-
-# try:
-#     # URL для создания индекса
-#     indexes_url = f"{splunk_host}/servicesNS/admin/launcher/data/indexes"
-
-#     # Параметры нового индекса
-#     index_data = {
-#         'name': index_name
-#     }
-
-#     # Отправка запроса на создание индекса
-#     response = requests.post(indexes_url, data=index_data, auth=(username, password), verify=False)
-    
-#     # Проверка статуса ответа
-#     response.raise_for_status()
-
-#     # Печать ответа для диагностики
-#     print("Create Index Response Text:", response.text)
-
-#     if response.status_code == 201:
-#         print(f"Индекс '{index_name}' успешно создан.")
-#     else:
-#         print(f"Ошибка при создании индекса '{index_name}':", response.text)
-
-# except requests.exceptions.RequestException as e:
-#     print(f"Ошибка запроса: {e}")

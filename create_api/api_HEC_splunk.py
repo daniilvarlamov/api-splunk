@@ -6,17 +6,12 @@ requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.
 
 def set_HEC_splunk(http_inputs_url,index,name,sourcetype, username, password):
     try:
-
-        
-
-
         data = {
             'disabled': 0,
             'index': index,
             'name': name,
-            'sourcetype': sourcetype
+            'indexes': index
         }
-
         create_response = requests.post(http_inputs_url, data=data, auth=(username,password), verify=False)
         create_response.raise_for_status()
         return create_response
@@ -56,8 +51,8 @@ if __name__=="__main__":
     splunk_host = "https://192.168.5.55:8089"
     username = "admin"
     password = "1q@3e4r"
-    index="denis_linux"
-    name="321"
+    index = "1-3321-321"
+    name=index
     sourcetype=index
     http_inputs_url = f"{splunk_host}/services/data/inputs/http"
 

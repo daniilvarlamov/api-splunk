@@ -46,4 +46,4 @@ if __name__=="__main__":
         if response.status_code==201:
             print("Успешно создано на узле:" + splunk_host)
         else:
-            print("Ошибка. Подробности: \n"+response)
+            print("Ошибка. Подробности: \n"+response.text)
