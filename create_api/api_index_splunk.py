@@ -1,45 +1,49 @@
 import requests
 import xml.etree.ElementTree as ET
 
+# Конфигурация Splunk
+splunk_server = "https://192.168.5.61:8089"
+username = "admin"
+password = "1q@3e4r"
 
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+# Аутентификация
+auth_url = f"{splunk_server}/services/auth/login"
+auth_response = requests.post(auth_url, data={"username": username, "password": password}, verify=False)
 
-def post_splunk_app(splunk_url,username,password,app_code):
-    try:
-        data = {
-            'datatype': 'event',
-            'maxTotalDataSizeMB': 500,
-            'name': app_code
-        }
+# Проверка успешности запроса
+if auth_response.status_code != 200:
+    print(f"Failed to authenticate. Status code: {auth_response.status_code}")
+    print(auth_response.text)
+    exit(1)
 
-        create_response = requests.post(splunk_url,data=data, auth=(username,password), verify=False)
+# Разбор XML-ответа
+try:
+    root = ET.fromstring(auth_response.text)
+    session_key = root.find('sessionKey').text
+except ET.ParseError:
+    print("Failed to parse XML response")
+    print(auth_response.text)
+    exit(1)
 
-        create_response.raise_for_status()
+# Заголовки с токеном
+headers = {
+    "Authorization": f"Splunk {session_key}"
+}
 
-        return create_response
-    
-    except requests.exceptions.RequestException as e:
+# Данные для создания индекса
+index_data = {
+    "name": "my_new_index2",
+    "homePath": "$SPLUNK_DB/my_new_index2/db",
+    "coldPath": "$SPLUNK_DB/my_new_index2/colddb",
+    "thawedPath": "$SPLUNK_DB/my_new_index2/thaweddb"
+}
 
-        return e.response
+# Создание индекса в system local
+create_index_url = f"{splunk_server}/servicesNS/admin/system/data/indexes"
+create_response = requests.post(create_index_url, headers=headers, data=index_data, verify=False)
 
-
-
-if __name__=="__main__":
-
-    splunk_hosts = ['192.168.5.133', '192.168.5.68']
-
-    username = "admin"
-    password = "1q@3e4r"
-
-    app_code = "1-3321-321"
-
-    for splunk_host in splunk_hosts:
-        splunk_url=f"https://{splunk_host}:8089/servicesNS/admin/{app_code}/data/indexes"
-
-        response = post_splunk_app(splunk_url, username, password, app_code)
-
-        if response.status_code==201:
-            print("Успешно создано на узле:" + splunk_host)
-        else:
-            print("Ошибка. Подробности: \n"+response.text)
-
+if create_response.status_code == 201:
+    print("Index created successfully.")
+else:
+    print(f"Failed to create index. Status code: {create_response.status_code}")
+    print(create_response.text)

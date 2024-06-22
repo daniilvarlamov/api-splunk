@@ -10,12 +10,7 @@ hec_url = f"{splunk_host}/services/collector/event"
 # Данные для отправки
 event_data = {
     "event": {
-        "time": '1719052500',
-        "event": {
-            "field1": "Hello",
-            "field2": "It's me))"
-        }
-        
+        "message": "Test Event From local machine"
     }
 }
 
@@ -38,4 +33,4 @@ try:
     print(f"Response text: {response.text}")
 
 except requests.exceptions.RequestException as e:
-    print(f"Ошибка запроса: {e}")
+    print(f"Ошибка запроса: {e.response.text}")
