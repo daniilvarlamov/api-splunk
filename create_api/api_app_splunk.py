@@ -28,11 +28,11 @@ def post_splunk_app(splunk_url,username,password,app_code, app_name):
 
 if __name__=="__main__":
 
-    splunk_hosts = ['192.168.5.151', '192.168.5.61', '192.168.5.133', '192.168.5.68', '192.168.5.55']
+    splunk_hosts = 'splunk_host'
 
     username = "admin"
 
-    password = "1q@3e4r"
+    password = "changeme"
 
     app_name = "test_app"
 

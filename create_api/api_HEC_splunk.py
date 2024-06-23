@@ -48,9 +48,9 @@ def get_HEC_token_splunk(http_inputs_url,name, username, password):
 
 
 if __name__=="__main__":
-    splunk_host = "https://192.168.5.55:8089"
+    splunk_host = "https://deploy_host:8089"
     username = "admin"
-    password = "1q@3e4r"
+    password = "changeme"
     index = "1-3321-321"
     name=index
     sourcetype=index

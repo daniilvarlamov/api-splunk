@@ -27,10 +27,10 @@ def post_role_splunk(splunk_url, username,password, app_code):
 
 
 if __name__=="__main__":
-    splunk_host = '192.168.5.151'
+    splunk_host = 'splunk_host'
 
     username = "admin"
-    password = "1q@3e4r"
+    password = "changeme"
 
     app_code = "1-3321-321"
 

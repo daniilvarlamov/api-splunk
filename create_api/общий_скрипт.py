@@ -68,7 +68,7 @@ def set_HEC_splunk(index,name, username, password):
             'indexes': index,
             'sourcetype': index
         }
-        create_response = requests.post('https://192.168.5.55:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
+        create_response = requests.post('https://deploy_host:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
         create_response.raise_for_status()
 
         root = ET.fromstring(create_response.text)
@@ -116,9 +116,9 @@ def post_role_splunk(splunk_server, username,password, name):
         return e.response
 
 if __name__=="__main__":
-    splunk_host = 'https://192.168.5.61:8089'
+    splunk_host = 'https://splunk_master:8089'
     username = "admin"
-    password = "1q@3e4r"
+    password = "changeme"
     app_code = "test_app"
     index = app_code
     zone = "dev"
@@ -144,8 +144,8 @@ if __name__=="__main__":
             if create_HEC_response['status_code']==201:
                 create_role_response = post_role_splunk(splunk_server=splunk_host, username=username, password=password, name=role_name)
                 if create_role_response.status_code==201:
-                    return_data['SPLUNK_PBU_TOKEN'] = create_HEC_response['token']
-                    return_data['SPLUNK_PBU_INDEX'] = create_index_response['index']
-                    return_data['SPLUNK_PBU_URL'] = f'https://pbu.splunk.{zone}.ppod.cbr.ru:15000/services/collector/event'
+                    return_data['SPLUNK_TOKEN'] = create_HEC_response['token']
+                    return_data['SPLUNK_INDEX'] = create_index_response['index']
+                    return_data['SPLUNK_URL'] = f'https://splunk_url:15000/services/collector/event'
 
     print(return_data)

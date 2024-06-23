@@ -2,9 +2,9 @@ import requests
 import xml.etree.ElementTree as ET
 
 # Конфигурация Splunk
-splunk_server = "https://192.168.5.61:8089"
+splunk_server = "https://splunk_host:8089"
 username = "admin"
-password = "1q@3e4r"
+password = "changeme"
 index = "my_new_index2"
 
 
