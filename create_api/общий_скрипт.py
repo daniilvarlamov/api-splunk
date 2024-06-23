@@ -32,7 +32,8 @@ def post_splunk_index(splunk_server, index, username, password):
             "name": index,
             "homePath": f"$SPLUNK_DB/{index}/db",
             "coldPath": f"$SPLUNK_DB/{index}/colddb",
-            "thawedPath": f"$SPLUNK_DB/{index}/thaweddb"
+            "thawedPath": f"$SPLUNK_DB/{index}/thaweddb",
+            "maxTotalDataSizeMB": 500
         }
 
         # Создание индекса в system local
@@ -58,7 +59,7 @@ def post_splunk_index(splunk_server, index, username, password):
         }
         return data
 
-def set_HEC_splunk(splunk_server,index,name, username, password):
+def set_HEC_splunk(index,name, username, password):
     try:
         data = {
             'disabled': 0,
@@ -67,7 +68,7 @@ def set_HEC_splunk(splunk_server,index,name, username, password):
             'indexes': index,
             'sourcetype': index
         }
-        create_response = requests.post(f'{splunk_server}/services/data/inputs/http', data=data, auth=(username,password), verify=False)
+        create_response = requests.post('https://192.168.5.55:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
         create_response.raise_for_status()
 
         root = ET.fromstring(create_response.text)
@@ -139,7 +140,7 @@ if __name__=="__main__":
     if create_app_response.status_code==201:
         create_index_response = post_splunk_index(splunk_server=splunk_host, index=index, username=username,password=password)
         if create_index_response['status_code']==201:
-            create_HEC_response = set_HEC_splunk(splunk_server=splunk_host, index=index, name=app_code, username=username, password=password)
+            create_HEC_response = set_HEC_splunk(index=index, name=app_code, username=username, password=password)
             if create_HEC_response['status_code']==201:
                 create_role_response = post_role_splunk(splunk_server=splunk_host, username=username, password=password, name=role_name)
                 if create_role_response.status_code==201:

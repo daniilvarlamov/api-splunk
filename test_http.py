@@ -3,14 +3,14 @@ import json
 
 # Параметры
 splunk_host = "https://192.168.5.55:8088"
-hec_token = "48d7468e-31a6-480f-aeab-799c11adb9c0"
+hec_token = "b0f7eaab-f3b0-45c0-9adc-3c233e1785c3"
 hec_url = f"{splunk_host}/services/collector/event"
 
 
 # Данные для отправки
 event_data = {
     "event": {
-        "message": "Test Event From local machine"
+        "message": "Test Event"
     }
 }
 
