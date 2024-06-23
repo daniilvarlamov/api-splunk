@@ -131,7 +131,7 @@ if __name__=="__main__":
         'Администратор приложения': 'admin-app',
         'ТУЗ приложения': 'service'
     }
-    role_name = f"ppod-{zone}-{role['Разработчик']}-{app_code}"
+    role_name = f"{zone}-{role['Разработчик']}-{app_code}"
     app_name = app_code
     return_data = {}
 
