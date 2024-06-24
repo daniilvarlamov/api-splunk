@@ -1,8 +1,75 @@
+from flask import Flask, request, jsonify
+import time
 import requests
 import xml.etree.ElementTree as ET
+import socket
+
+app = Flask(__name__)
 
 
+@app.route('/orders', methods=['POST'])
+def handle_post():
+    try:
+        # client_ip = request.remote_addr
+        # try:
+        #     client_hostname = socket.gethostbyaddr(client_ip)[0]
+        # except:
+        #     client_hostname=client_ip
 
+
+        # result_data = {
+        #     'client_ip': client_ip,
+        #     'client_hostname': client_hostname
+        # }
+        # return jsonify(result_data)
+        data = request.json
+        splunk_host = 'https://splunk_host:8089'
+        username = "admin"
+        password = "changeme"
+        app_code = data.get('code')
+        index = app_code
+        zone = {
+            'dev': 'dev',
+            'prod': 'prod',
+            'test': 'test'
+        }
+        role = {
+            'Тестировщик': 'qa',
+            'Разработчик': 'developer',
+            'Руководитель разработки': 'devlead',
+            'IT-Лидер': 'it-lead',
+            'Бизнес-пользователь': 'pbu',
+            'Администратор приложения': 'admin-app',
+            'ТУЗ приложения': 'service'
+        }
+        role_name = f"{zone['dev']}-{role['Разработчик']}-{app_code}"
+        app_name = app_code
+        return_data = {}
+
+        create_app_response = post_splunk_app(splunk_server=splunk_host, username=username, password=password, app_code=app_code, app_name=app_name)
+
+        if create_app_response.status_code==201:
+            create_index_response = post_splunk_index(splunk_server=splunk_host, index=index, username=username,password=password)
+            if create_index_response['status_code']==201:
+                create_HEC_response = set_HEC_splunk(index=index, name=app_code, username=username, password=password)
+                if create_HEC_response['status_code']==201:
+                    create_role_response = post_role_splunk(splunk_server=splunk_host, username=username, password=password, name=role_name, app_code=app_code)
+                    if create_role_response.status_code==201:
+                        return_data['SPLUNK_TOKEN'] = create_HEC_response['token']
+                        return_data['SPLUNK_INDEX'] = create_index_response['index']
+                        return_data['SPLUNK_URL'] = f'https://splunk_url:15000/services/collector/event'
+        return jsonify(return_data)
+        
+    except Exception as e:
+        response_data = {
+            'timestamp': int(time.time()*1000),
+            'status': 400,
+            'error': 'Bad Request',
+            'exception': str(type(e).__name__),
+            'message': str(e),
+            'path': request.path
+        }
+        return jsonify(response_data), 400
 
 def post_splunk_app(splunk_server,username,password,app_code, app_name):
     try:
@@ -68,7 +135,7 @@ def set_HEC_splunk(index,name, username, password):
             'indexes': index,
             'sourcetype': index
         }
-        create_response = requests.post('https://deploy_host:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
+        create_response = requests.post('https://192.168.5.55:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
         create_response.raise_for_status()
 
         root = ET.fromstring(create_response.text)
@@ -94,7 +161,7 @@ def set_HEC_splunk(index,name, username, password):
             'response': e.response.text
         }
 
-def post_role_splunk(splunk_server, username,password, name):
+def post_role_splunk(splunk_server, username,password, name, app_code):
     try:
         data = {
             'defaultApp': app_code,
@@ -116,36 +183,4 @@ def post_role_splunk(splunk_server, username,password, name):
         return e.response
 
 if __name__=="__main__":
-    splunk_host = 'https://splunk_master:8089'
-    username = "admin"
-    password = "changeme"
-    app_code = "test_app"
-    index = app_code
-    zone = "dev"
-    role = {
-        'Тестировщик': 'qa',
-        'Разработчик': 'developer',
-        'Руководитель разработки': 'devlead',
-        'IT-Лидер': 'it-lead',
-        'Бизнес-пользователь': 'pbu',
-        'Администратор приложения': 'admin-app',
-        'ТУЗ приложения': 'service'
-    }
-    role_name = f"{zone}-{role['Разработчик']}-{app_code}"
-    app_name = app_code
-    return_data = {}
-
-    create_app_response = post_splunk_app(splunk_server=splunk_host, username=username, password=password, app_code=app_code, app_name=app_name)
-
-    if create_app_response.status_code==201:
-        create_index_response = post_splunk_index(splunk_server=splunk_host, index=index, username=username,password=password)
-        if create_index_response['status_code']==201:
-            create_HEC_response = set_HEC_splunk(index=index, name=app_code, username=username, password=password)
-            if create_HEC_response['status_code']==201:
-                create_role_response = post_role_splunk(splunk_server=splunk_host, username=username, password=password, name=role_name)
-                if create_role_response.status_code==201:
-                    return_data['SPLUNK_TOKEN'] = create_HEC_response['token']
-                    return_data['SPLUNK_INDEX'] = create_index_response['index']
-                    return_data['SPLUNK_URL'] = f'https://splunk_url:15000/services/collector/event'
-
-    print(return_data)
+    app.run(debug=True,host="0.0.0.0")

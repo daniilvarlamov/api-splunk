@@ -2,8 +2,8 @@ import requests
 import json
 
 # Параметры
-splunk_host = "https://splunk_host:8088"
-hec_token = "HEC_token"
+splunk_host = "https://192.168.5.55:8088"
+hec_token = "fd54a412-8f02-47bb-ae86-5e1bf8f22ddb"
 hec_url = f"{splunk_host}/services/collector/event"
 
 
