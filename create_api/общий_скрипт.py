@@ -10,18 +10,6 @@ app = Flask(__name__)
 @app.route('/orders', methods=['POST'])
 def handle_post():
     try:
-        # client_ip = request.remote_addr
-        # try:
-        #     client_hostname = socket.gethostbyaddr(client_ip)[0]
-        # except:
-        #     client_hostname=client_ip
-
-
-        # result_data = {
-        #     'client_ip': client_ip,
-        #     'client_hostname': client_hostname
-        # }
-        # return jsonify(result_data)
         data = request.json
         splunk_host = 'https://splunk_host:8089'
         username = "admin"
@@ -135,7 +123,7 @@ def set_HEC_splunk(index,name, username, password):
             'indexes': index,
             'sourcetype': index
         }
-        create_response = requests.post('https://192.168.5.55:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
+        create_response = requests.post('https://splunk_host:8089/services/data/inputs/http', data=data, auth=(username,password), verify=False)
         create_response.raise_for_status()
 
         root = ET.fromstring(create_response.text)
